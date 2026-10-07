@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -15,14 +14,19 @@ function FindRide() {
       return;
     }
 
-    alert(
-      `Searching rides from ${source} to ${destination} on ${date}`
-    );
+    alert(`Searching rides from ${source} to ${destination} on ${date}`);
   };
 
   return (
-    <div>
-      <h1>🚗 CampusRide</h1>
+    <div className="page">
+      <div className="header">
+        <div className="logo">🚗 CampusRide</div>
+
+        <div className="nav">
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/profile">Profile</Link>
+        </div>
+      </div>
 
       <h2>Find a Ride</h2>
 
@@ -31,42 +35,39 @@ function FindRide() {
       <hr />
 
       <form onSubmit={handleSearch}>
-        <div>
-          <label>Source</label>
-          <br />
-          <input
-            type="text"
-            placeholder="Enter starting location"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          />
-        </div>
+        <label>Source</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Enter starting location"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+        />
 
         <br />
-
-        <div>
-          <label>Destination</label>
-          <br />
-          <input
-            type="text"
-            placeholder="Enter destination"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        </div>
-
         <br />
 
-        <div>
-          <label>Date</label>
-          <br />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
+        <label>Destination</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Enter destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+        />
 
+        <br />
+        <br />
+
+        <label>Date</label>
+        <br />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+
+        <br />
         <br />
 
         <button type="submit">Search Rides</button>
@@ -76,9 +77,13 @@ function FindRide() {
 
       <h3>Available Rides</h3>
 
-      <p>No rides available yet.</p>
+      <div className="card">
+        <p>No rides available yet.</p>
+      </div>
 
-      <Link to="/dashboard">← Back to Dashboard</Link>
+      <div className="links">
+        <Link to="/dashboard">← Back to Dashboard</Link>
+      </div>
     </div>
   );
 }

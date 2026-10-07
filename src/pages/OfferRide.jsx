@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -13,14 +12,7 @@ function OfferRide() {
   const handleOfferRide = (e) => {
     e.preventDefault();
 
-    if (
-      !source ||
-      !destination ||
-      !date ||
-      !time ||
-      !seats ||
-      !vehicle
-    ) {
+    if (!source || !destination || !date || !time || !seats || !vehicle) {
       alert("Please fill all fields");
       return;
     }
@@ -29,8 +21,15 @@ function OfferRide() {
   };
 
   return (
-    <div>
-      <h1>🚗 CampusRide</h1>
+    <div className="page">
+      <div className="header">
+        <div className="logo">🚗 CampusRide</div>
+
+        <div className="nav">
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/profile">Profile</Link>
+        </div>
+      </div>
 
       <h2>Offer a Ride</h2>
 
@@ -39,90 +38,84 @@ function OfferRide() {
       <hr />
 
       <form onSubmit={handleOfferRide}>
-        <div>
-          <label>Source</label>
-          <br />
-          <input
-            type="text"
-            placeholder="Enter starting location"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          />
-        </div>
+        <label>Source</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Enter starting location"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+        />
 
         <br />
-
-        <div>
-          <label>Destination</label>
-          <br />
-          <input
-            type="text"
-            placeholder="Enter destination"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        </div>
-
         <br />
 
-        <div>
-          <label>Date</label>
-          <br />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
+        <label>Destination</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Enter destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+        />
 
         <br />
-
-        <div>
-          <label>Time</label>
-          <br />
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
-        </div>
-
         <br />
 
-        <div>
-          <label>Available Seats</label>
-          <br />
-          <input
-            type="number"
-            min="1"
-            max="10"
-            placeholder="Number of seats"
-            value={seats}
-            onChange={(e) => setSeats(e.target.value)}
-          />
-        </div>
+        <label>Date</label>
+        <br />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
 
         <br />
+        <br />
 
-        <div>
-          <label>Vehicle</label>
-          <br />
-          <input
-            type="text"
-            placeholder="Example: Honda Activa"
-            value={vehicle}
-            onChange={(e) => setVehicle(e.target.value)}
-          />
-        </div>
+        <label>Time</label>
+        <br />
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+        />
 
+        <br />
+        <br />
+
+        <label>Available Seats</label>
+        <br />
+        <input
+          type="number"
+          min="1"
+          max="10"
+          placeholder="Number of seats"
+          value={seats}
+          onChange={(e) => setSeats(e.target.value)}
+        />
+
+        <br />
+        <br />
+
+        <label>Vehicle</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Example: Honda Activa"
+          value={vehicle}
+          onChange={(e) => setVehicle(e.target.value)}
+        />
+
+        <br />
         <br />
 
         <button type="submit">Post Ride</button>
       </form>
 
-      <hr />
-
-      <Link to="/dashboard">← Back to Dashboard</Link>
+      <div className="links">
+        <Link to="/dashboard">← Back to Dashboard</Link>
+      </div>
     </div>
   );
 }

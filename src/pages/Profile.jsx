@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -13,8 +12,15 @@ function Profile() {
   };
 
   return (
-    <div>
-      <h1>🚗 CampusRide</h1>
+    <div className="page">
+      <div className="header">
+        <div className="logo">🚗 CampusRide</div>
+
+        <div className="nav">
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/">Logout</Link>
+        </div>
+      </div>
 
       <h2>My Profile</h2>
 
@@ -23,41 +29,38 @@ function Profile() {
       <hr />
 
       <form onSubmit={handleSave}>
-        <div>
-          <label>Full Name</label>
-          <br />
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+        <label>Full Name</label>
+        <br />
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
         <br />
-
-        <div>
-          <label>College Email</label>
-          <br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
         <br />
 
-        <div>
-          <label>Phone Number</label>
-          <br />
-          <input
-            type="tel"
-            placeholder="Enter phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+        <label>College Email</label>
+        <br />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
+        <br />
+        <br />
+
+        <label>Phone Number</label>
+        <br />
+        <input
+          type="tel"
+          placeholder="Enter phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+
+        <br />
         <br />
 
         <button type="submit">Save Profile</button>
@@ -67,11 +70,13 @@ function Profile() {
 
       <h3>My Account</h3>
 
-      <p>Account Type: Student</p>
+      <div className="card">
+        <p>Account Type: Student</p>
+      </div>
 
-      <br />
-
-      <Link to="/dashboard">← Back to Dashboard</Link>
+      <div className="links">
+        <Link to="/dashboard">← Back to Dashboard</Link>
+      </div>
     </div>
   );
 }

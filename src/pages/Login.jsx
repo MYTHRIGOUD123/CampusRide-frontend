@@ -19,50 +19,47 @@ function Login() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        textAlign: "center",
-      }}
-    >
-      <div>
-        <h1>🚗 CampusRide</h1>
+    <div className="page">
+      <div className="header">
+        <div className="logo">🚗 CampusRide</div>
 
-        <h2>Login</h2>
+        <div className="nav">
+          <Link to="/">Home</Link>
+          <Link to="/register">Register</Link>
+        </div>
+      </div>
 
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>College Email</label>
-            <br />
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+      <h2>Login</h2>
 
-          <br />
+      <form onSubmit={handleLogin}>
+        <label>College Email</label>
+        <br />
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          <div>
-            <label>Password</label>
-            <br />
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+        <br />
+        <br />
 
-          <br />
+        <label>Password</label>
+        <br />
+        <input
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <button type="submit">Login</button>
-        </form>
+        <br />
+        <br />
 
+        <button type="submit">Login</button>
+      </form>
+
+      <div className="links">
         <p>
           Don't have an account? <Link to="/register">Register</Link>
         </p>
@@ -74,4 +71,3 @@ function Login() {
 }
 
 export default Login;
-

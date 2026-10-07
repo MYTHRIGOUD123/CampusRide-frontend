@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 
 function RideRequests() {
@@ -11,8 +10,15 @@ function RideRequests() {
   };
 
   return (
-    <div>
-      <h1>🚗 CampusRide</h1>
+    <div className="page">
+      <div className="header">
+        <div className="logo">🚗 CampusRide</div>
+
+        <div className="nav">
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/profile">Profile</Link>
+        </div>
+      </div>
 
       <h2>Ride Requests</h2>
 
@@ -22,25 +28,34 @@ function RideRequests() {
 
       <h3>Pending Requests</h3>
 
-      <div>
-        <p><strong>Student:</strong> Rahul</p>
-        <p><strong>Source:</strong> College</p>
-        <p><strong>Destination:</strong> Hyderabad</p>
-        <p><strong>Date:</strong> 15-10-2026</p>
+      <div className="card">
+        <p>
+          <strong>Student:</strong> Rahul
+        </p>
 
-        <button onClick={handleAccept}>Accept</button>
-        {" "}
+        <p>
+          <strong>Source:</strong> College
+        </p>
+
+        <p>
+          <strong>Destination:</strong> Hyderabad
+        </p>
+
+        <p>
+          <strong>Date:</strong> 15-10-2026
+        </p>
+
+        <button onClick={handleAccept}>Accept</button>{" "}
         <button onClick={handleReject}>Reject</button>
       </div>
 
-      <hr />
-
       <p>No more pending requests.</p>
 
-      <Link to="/dashboard">← Back to Dashboard</Link>
+      <div className="links">
+        <Link to="/dashboard">← Back to Dashboard</Link>
+      </div>
     </div>
   );
 }
 
 export default RideRequests;
-
