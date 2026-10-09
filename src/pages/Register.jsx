@@ -1,5 +1,7 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
@@ -7,17 +9,43 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    if (!name || !email || !password) {
-      alert("Please fill all fields");
+    if (!name.trim() || !email.trim() || !password) {
+      setMessage("Please fill all fields");
       return;
     }
 
-    alert("Registration successful!");
-    navigate("/login");
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/students/register",
+        {
+          name: name.trim(),
+          email: email.trim(),
+          password: password,
+        }
+      );
+
+      setMessage(response.data.message || "Registration successful!");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message ||
+          "Registration failed. Please check if the backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +69,7 @@ function Register() {
           placeholder="Enter your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
         />
 
         <br />
@@ -53,6 +82,7 @@ function Register() {
           placeholder="Enter your college email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
 
         <br />
@@ -65,12 +95,18 @@ function Register() {
           placeholder="Create a password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={8}
         />
 
         <br />
         <br />
 
-        <button type="submit">Register</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
+
+        {message && <p role="status">{message}</p>}
       </form>
 
       <div className="links">
@@ -85,4 +121,3 @@ function Register() {
 }
 
 export default Register;
-

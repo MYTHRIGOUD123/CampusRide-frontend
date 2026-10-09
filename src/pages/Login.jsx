@@ -1,21 +1,53 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    if (!email || !password) {
-      alert("Please enter email and password");
+    if (!email.trim() || !password) {
+      setMessage("Please enter email and password");
       return;
     }
 
-    navigate("/dashboard");
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/students/login",
+        {
+          email: email.trim(),
+          password: password,
+        }
+      );
+
+      setMessage(response.data.message || "Login successful!");
+
+    setTimeout(() => {
+  navigate("/dashboard", {
+    state: {
+      student: response.data,
+    },
+  });
+}, 800);
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message ||
+          "Login failed. Please check if the backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,6 +71,7 @@ function Login() {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
 
         <br />
@@ -51,12 +84,17 @@ function Login() {
           placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
         <br />
         <br />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        {message && <p role="status">{message}</p>}
       </form>
 
       <div className="links">

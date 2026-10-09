@@ -1,23 +1,76 @@
-import { Link } from "react-router-dom";
+
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 function OfferRide() {
+  const location = useLocation();
+  const student = location.state?.student;
+
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [seats, setSeats] = useState("");
   const [vehicle, setVehicle] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleOfferRide = (e) => {
+  const handleOfferRide = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    if (!source || !destination || !date || !time || !seats || !vehicle) {
-      alert("Please fill all fields");
+    if (!student?.id) {
+      setMessage("Student details not found. Please log in again.");
       return;
     }
 
-    alert("Ride posted successfully!");
+    if (
+      !source.trim() ||
+      !destination.trim() ||
+      !date ||
+      !time ||
+      !seats ||
+      !vehicle.trim()
+    ) {
+      setMessage("Please fill all fields.");
+      return;
+    }
+
+    if (source.trim().toLowerCase() === destination.trim().toLowerCase()) {
+      setMessage("Source and destination must be different.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await axios.post("http://localhost:8080/api/rides", {
+        studentId: student.id,
+        source: source.trim(),
+        destination: destination.trim(),
+        travelDate: date,
+        availableSeats: Number(seats),
+        time: time,
+        vehicle: vehicle.trim(),
+      });
+
+      setMessage("Ride posted successfully!");
+
+      setSource("");
+      setDestination("");
+      setDate("");
+      setTime("");
+      setSeats("");
+      setVehicle("");
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message ||
+          "Unable to post ride. Please check whether the backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,13 +79,16 @@ function OfferRide() {
         <div className="logo">🚗 CampusRide</div>
 
         <div className="nav">
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/profile">Profile</Link>
+          <Link to="/dashboard" state={{ student }}>
+            Dashboard
+          </Link>
+          <Link to="/profile" state={{ student }}>
+            Profile
+          </Link>
         </div>
       </div>
 
       <h2>Offer a Ride</h2>
-
       <p>Share your ride with fellow students.</p>
 
       <hr />
@@ -45,6 +101,7 @@ function OfferRide() {
           placeholder="Enter starting location"
           value={source}
           onChange={(e) => setSource(e.target.value)}
+          required
         />
 
         <br />
@@ -57,6 +114,7 @@ function OfferRide() {
           placeholder="Enter destination"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
+          required
         />
 
         <br />
@@ -67,7 +125,9 @@ function OfferRide() {
         <input
           type="date"
           value={date}
+          min={new Date().toLocaleDateString("en-CA")}
           onChange={(e) => setDate(e.target.value)}
+          required
         />
 
         <br />
@@ -79,6 +139,7 @@ function OfferRide() {
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
+          required
         />
 
         <br />
@@ -93,6 +154,7 @@ function OfferRide() {
           placeholder="Number of seats"
           value={seats}
           onChange={(e) => setSeats(e.target.value)}
+          required
         />
 
         <br />
@@ -105,16 +167,23 @@ function OfferRide() {
           placeholder="Example: Honda Activa"
           value={vehicle}
           onChange={(e) => setVehicle(e.target.value)}
+          required
         />
 
         <br />
         <br />
 
-        <button type="submit">Post Ride</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Posting..." : "Post Ride"}
+        </button>
       </form>
 
+      {message && <p role="status">{message}</p>}
+
       <div className="links">
-        <Link to="/dashboard">← Back to Dashboard</Link>
+        <Link to="/dashboard" state={{ student }}>
+          ← Back to Dashboard
+        </Link>
       </div>
     </div>
   );
