@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "https://campusride-backend-1.onrender.com";
+
 function OfferRide() {
   const location = useLocation();
   const student = location.state?.student;
@@ -42,16 +44,21 @@ function OfferRide() {
       return;
     }
 
+    if (Number(seats) < 1 || Number(seats) > 10) {
+      setMessage("Available seats must be between 1 and 10.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:8080/api/rides", {
+      const response = await axios.post(`${API_BASE_URL}/api/rides`, {
         studentId: student.id,
         source: source.trim(),
         destination: destination.trim(),
         travelDate: date,
         availableSeats: Number(seats),
-        time: time,
+        time,
         vehicle: vehicle.trim(),
       });
 
@@ -63,10 +70,16 @@ function OfferRide() {
       setTime("");
       setSeats("");
       setVehicle("");
+
+      console.log("Ride created:", response.data);
     } catch (error) {
+      console.error("Error offering ride:", error);
+
       setMessage(
         error.response?.data?.message ||
-          "Unable to post ride. Please check whether the backend is running."
+          (error.response
+            ? `Could not post ride. Server returned ${error.response.status}.`
+            : "Cannot reach the backend. Please check your internet connection or try again shortly.")
       );
     } finally {
       setLoading(false);
@@ -104,8 +117,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Destination</label>
         <br />
@@ -117,8 +129,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Date</label>
         <br />
@@ -130,8 +141,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Time</label>
         <br />
@@ -142,8 +152,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Available Seats</label>
         <br />
@@ -157,8 +166,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Vehicle</label>
         <br />
@@ -170,8 +178,7 @@ function OfferRide() {
           required
         />
 
-        <br />
-        <br />
+        <br /><br />
 
         <button type="submit" disabled={loading}>
           {loading ? "Posting..." : "Post Ride"}

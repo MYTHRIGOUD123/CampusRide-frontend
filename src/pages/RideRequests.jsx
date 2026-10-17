@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "https://campusride-backend-1.onrender.com";
+
 function RideRequests() {
   const location = useLocation();
   const student = location.state?.student;
@@ -22,26 +24,28 @@ function RideRequests() {
     setMessage("");
 
     try {
-      // Load rides offered by this student
       const rideResponse = await axios.get(
-        `http://localhost:8080/api/rides/student/${student.id}`
+        `${API_BASE_URL}/api/rides/student/${student.id}`
       );
 
-      const ownRides = rideResponse.data;
+      const ownRides = Array.isArray(rideResponse.data)
+        ? rideResponse.data
+        : [];
 
-      // Load incoming requests for each of those rides
       const results = await Promise.all(
         ownRides.map(async (ride) => {
           const response = await axios.get(
-            `http://localhost:8080/api/ride-requests/ride/${ride.id}`
+            `${API_BASE_URL}/api/ride-requests/ride/${ride.id}`
           );
 
-          return response.data.map((request) => ({
-            ...request,
-            rideSource: ride.source,
-            rideDestination: ride.destination,
-            rideDate: ride.travelDate,
-          }));
+          return (Array.isArray(response.data) ? response.data : []).map(
+            (request) => ({
+              ...request,
+              rideSource: ride.source,
+              rideDestination: ride.destination,
+              rideDate: ride.travelDate,
+            })
+          );
         })
       );
 
@@ -52,9 +56,13 @@ function RideRequests() {
         setMessage("You don't have any incoming ride requests yet.");
       }
     } catch (error) {
+      console.error("Error loading ride requests:", error);
+
       setMessage(
         error.response?.data?.message ||
-        "Unable to load requests. Check whether the backend is running."
+          (error.response
+            ? `Request failed with status ${error.response.status}.`
+            : "Cannot connect to the backend. Check your connection and try again.")
       );
     } finally {
       setLoading(false);
@@ -71,7 +79,7 @@ function RideRequests() {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/ride-requests/${requestId}/status`,
+        `${API_BASE_URL}/api/ride-requests/${requestId}/status`,
         { status }
       );
 
@@ -85,9 +93,13 @@ function RideRequests() {
 
       setMessage(`Request ${status.toLowerCase()} successfully.`);
     } catch (error) {
+      console.error("Error updating request:", error);
+
       setMessage(
         error.response?.data?.message ||
-        "Unable to update request status."
+          (error.response
+            ? `Request update failed with status ${error.response.status}.`
+            : "Cannot connect to the backend. Please try again.")
       );
     } finally {
       setUpdatingId(null);
@@ -98,14 +110,20 @@ function RideRequests() {
     <div className="page">
       <div className="header">
         <div className="logo">🚗 CampusRide</div>
+
         <div className="nav">
-          <Link to="/dashboard" state={{ student }}>Dashboard</Link>
-          <Link to="/profile" state={{ student }}>Profile</Link>
+          <Link to="/dashboard" state={{ student }}>
+            Dashboard
+          </Link>
+          <Link to="/profile" state={{ student }}>
+            Profile
+          </Link>
         </div>
       </div>
 
       <h2>Ride Requests</h2>
       <p>View requests for rides you have offered.</p>
+
       <hr />
 
       <button type="button" onClick={loadRequests} disabled={loading}>
@@ -135,10 +153,7 @@ function RideRequests() {
                 onClick={() => updateStatus(request.id, "ACCEPTED")}
               >
                 {updatingId === request.id ? "Updating..." : "Accept"}
-              </button>
-
-              {" "}
-
+              </button>{" "}
               <button
                 type="button"
                 disabled={updatingId === request.id}
@@ -161,3 +176,4 @@ function RideRequests() {
 }
 
 export default RideRequests;
+

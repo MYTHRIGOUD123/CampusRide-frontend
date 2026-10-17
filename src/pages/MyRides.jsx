@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "https://campusride-backend-1.onrender.com";
+
 function MyRides() {
   const location = useLocation();
   const student = location.state?.student;
@@ -24,26 +26,28 @@ function MyRides() {
     try {
       const [ridesResponse, requestsResponse] = await Promise.all([
         axios.get(
-          `http://localhost:8080/api/rides/student/${student.id}`
+          `${API_BASE_URL}/api/rides/student/${student.id}`
         ),
         axios.get(
-          `http://localhost:8080/api/ride-requests/student/${student.id}`
+          `${API_BASE_URL}/api/ride-requests/student/${student.id}`
         ),
       ]);
 
-      setOfferedRides(ridesResponse.data);
-      setSentRequests(requestsResponse.data);
+      setOfferedRides(
+        Array.isArray(ridesResponse.data) ? ridesResponse.data : []
+      );
 
-      if (
-        ridesResponse.data.length === 0 &&
-        requestsResponse.data.length === 0
-      ) {
-        setMessage("You haven't offered or requested any rides yet.");
-      }
+      setSentRequests(
+        Array.isArray(requestsResponse.data) ? requestsResponse.data : []
+      );
     } catch (error) {
+      console.error("Error loading my rides:", error);
+
       setMessage(
         error.response?.data?.message ||
-        "Unable to load your rides. Check whether the backend is running."
+          (error.response
+            ? `Request failed with status ${error.response.status}.`
+            : "Cannot connect to the backend. Check your connection and try again.")
       );
     } finally {
       setLoading(false);
@@ -72,11 +76,7 @@ function MyRides() {
       <h2>My Rides</h2>
       <p>View rides you offered and requests you sent.</p>
 
-      <button
-        type="button"
-        onClick={loadMyRides}
-        disabled={loading}
-      >
+      <button type="button" onClick={loadMyRides} disabled={loading}>
         {loading ? "Loading..." : "Refresh"}
       </button>
 
@@ -91,7 +91,9 @@ function MyRides() {
       ) : (
         offeredRides.map((ride) => (
           <div className="card" key={ride.id}>
-            <h4>{ride.source} → {ride.destination}</h4>
+            <h4>
+              {ride.source} → {ride.destination}
+            </h4>
             <p>Ride ID: {ride.id}</p>
             <p>Travel Date: {ride.travelDate}</p>
             <p>Available Seats: {ride.availableSeats}</p>
@@ -127,3 +129,4 @@ function MyRides() {
 }
 
 export default MyRides;
+

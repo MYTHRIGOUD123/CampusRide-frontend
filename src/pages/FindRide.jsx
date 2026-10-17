@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "https://campusride-backend-1.onrender.com";
+
 function FindRide() {
   const location = useLocation();
   const student = location.state?.student;
@@ -23,19 +25,30 @@ function FindRide() {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/rides/search",
-        { params: { source, destination, travelDate } }
+        `${API_BASE_URL}/api/rides/search`,
+        {
+          params: {
+            source: source.trim(),
+            destination: destination.trim(),
+            travelDate,
+          },
+        }
       );
 
-      setRides(response.data);
+      const results = Array.isArray(response.data) ? response.data : [];
+      setRides(results);
 
-      if (response.data.length === 0) {
+      if (results.length === 0) {
         setMessage("No rides found for your search.");
       }
     } catch (error) {
+      console.error("Error searching rides:", error);
+
       setMessage(
         error.response?.data?.message ||
-        "Unable to search rides. Check whether the backend is running."
+          (error.response
+            ? `Ride search failed. Server returned ${error.response.status}.`
+            : "Cannot reach the backend. Please check your connection and try again.")
       );
     } finally {
       setLoading(false);
@@ -52,16 +65,20 @@ function FindRide() {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:8080/api/ride-requests", {
+      await axios.post(`${API_BASE_URL}/api/ride-requests`, {
         rideId,
         studentId: student.id,
       });
 
       setMessage("Ride request sent successfully!");
     } catch (error) {
+      console.error("Error requesting ride:", error);
+
       setMessage(
         error.response?.data?.message ||
-        "Unable to send request. Please try again."
+          (error.response
+            ? `Could not send ride request. Server returned ${error.response.status}.`
+            : "Cannot reach the backend. Please try again.")
       );
     } finally {
       setRequestingRideId(null);
@@ -72,18 +89,25 @@ function FindRide() {
     <div className="page">
       <div className="header">
         <div className="logo">🚗 CampusRide</div>
+
         <div className="nav">
-          <Link to="/dashboard" state={{ student }}>Dashboard</Link>
-          <Link to="/profile" state={{ student }}>Profile</Link>
+          <Link to="/dashboard" state={{ student }}>
+            Dashboard
+          </Link>
+          <Link to="/profile" state={{ student }}>
+            Profile
+          </Link>
         </div>
       </div>
 
       <h2>Find a Ride</h2>
       <p>Find students traveling in the same direction.</p>
+
       <hr />
 
       <form onSubmit={handleSearch}>
-        <label>Starting Location</label><br />
+        <label>Starting Location</label>
+        <br />
         <input
           type="text"
           placeholder="Enter starting location"
@@ -91,9 +115,11 @@ function FindRide() {
           onChange={(e) => setSource(e.target.value)}
           required
         />
+
         <br /><br />
 
-        <label>Destination</label><br />
+        <label>Destination</label>
+        <br />
         <input
           type="text"
           placeholder="Enter destination"
@@ -101,15 +127,18 @@ function FindRide() {
           onChange={(e) => setDestination(e.target.value)}
           required
         />
+
         <br /><br />
 
-        <label>Travel Date</label><br />
+        <label>Travel Date</label>
+        <br />
         <input
           type="date"
           value={travelDate}
           onChange={(e) => setTravelDate(e.target.value)}
           required
         />
+
         <br /><br />
 
         <button type="submit" disabled={loading}>
@@ -125,12 +154,15 @@ function FindRide() {
 
           {rides.map((ride) => (
             <div className="card" key={ride.id}>
-              <h3>{ride.source} → {ride.destination}</h3>
+              <h3>
+                {ride.source} → {ride.destination}
+              </h3>
+
               <p>Travel Date: {ride.travelDate}</p>
               <p>Available Seats: {ride.availableSeats}</p>
               <p>Ride ID: {ride.id}</p>
 
-              {student?.id === ride.studentId ? (
+              {Number(student?.id) === Number(ride.studentId) ? (
                 <p>This is your ride.</p>
               ) : (
                 <button
@@ -158,4 +190,5 @@ function FindRide() {
 }
 
 export default FindRide;
+
 
