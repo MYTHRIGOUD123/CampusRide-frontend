@@ -25,13 +25,13 @@ function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/students/register",
-        {
-          name: name.trim(),
-          email: email.trim(),
-          password: password,
-        }
-      );
+  "https://campusride-backend-1.onrender.com/api/students/register",
+  {
+    name: name,
+    email: email.trim(),
+    password: password,
+  }
+);
 
       setMessage(response.data.message || "Registration successful!");
 
