@@ -24,7 +24,7 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/students/login",
+        "https://campusride-backend-1.onrender.com/api/students/login",
         {
           email: email.trim(),
           password: password,
@@ -33,18 +33,28 @@ function Login() {
 
       setMessage(response.data.message || "Login successful!");
 
-    setTimeout(() => {
-  navigate("/dashboard", {
-    state: {
-      student: response.data,
-    },
-  });
-}, 800);
+      setTimeout(() => {
+        navigate("/dashboard", {
+          state: {
+            student: response.data,
+          },
+        });
+      }, 800);
     } catch (error) {
-      setMessage(
-        error.response?.data?.message ||
-          "Login failed. Please check if the backend is running."
-      );
+      console.error("Login error:", error);
+
+      if (error.response) {
+        setMessage(
+          error.response.data?.message ||
+            `Login failed. Server returned ${error.response.status}.`
+        );
+      } else if (error.request) {
+        setMessage(
+          "Cannot reach the backend. Please check the server or CORS settings."
+        );
+      } else {
+        setMessage("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -66,6 +76,7 @@ function Login() {
       <form onSubmit={handleLogin}>
         <label>College Email</label>
         <br />
+
         <input
           type="email"
           placeholder="Enter your email"
@@ -79,6 +90,7 @@ function Login() {
 
         <label>Password</label>
         <br />
+
         <input
           type="password"
           placeholder="Enter your password"
@@ -109,3 +121,4 @@ function Login() {
 }
 
 export default Login;
+
